@@ -102,10 +102,10 @@ void descKeypoints(vector<cv::KeyPoint> &keypoints, cv::Mat &img, cv::Mat &descr
     }
 
     // perform feature description
-    double t = (double)cv::getTickCount();
+    //double t = (double)cv::getTickCount();
     extractor->compute(img, keypoints, descriptors);
-    t = ((double)cv::getTickCount() - t) / cv::getTickFrequency();
-    cout << descriptorType << " descriptor extraction in " << 1000 * t / 1.0 << " ms" << endl;
+    //t = ((double)cv::getTickCount() - t) / cv::getTickFrequency();
+    //cout << descriptorType << " descriptor extraction in " << 1000 * t / 1.0 << " ms" << endl;
 }
 
 // Detect keypoints in image using the traditional Shi-Thomasi detector
@@ -223,11 +223,17 @@ void detKeypointsHarris(std::vector<cv::KeyPoint> &keypoints, cv::Mat &img, bool
 void detKeypointsModern(std::vector<cv::KeyPoint> &keypoints, cv::Mat &img, std::string detectorType, bool bVis)
 {
     if (detectorType.compare("FAST") == 0) {
+
+        //classroom implementation produces less keypoints
+        /*
         int threshold = 30;  // difference between intensity of the central pixel and pixels of a circle around this pixel
         bool bNMS = true;    // perform non-maxima suppression on keypoints
         cv::FastFeatureDetector::DetectorType type = cv::FastFeatureDetector::TYPE_9_16; // TYPE_9_16, TYPE_7_12, TYPE_5_8
-
         auto fast = cv::FastFeatureDetector::create(threshold, bNMS, type);
+        */
+
+        //standard impelemtation
+        auto fast = cv::FastFeatureDetector::create();
         fast->detect(img, keypoints);
     }
     else if (detectorType.compare("BRISK") == 0) {

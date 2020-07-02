@@ -18,11 +18,17 @@
 
 using namespace std;
 
+std::ofstream fs;//file to store results 
+//std::string filename = "MP7_results.csv";
+//std::string filename = "MP89_results_newFAST.csv";
+
 /* MAIN PROGRAM */
 int main(int argc, const char *argv[])
 {
 
     /* INIT VARIABLES AND DATA STRUCTURES */
+    //fs.open(filename, std::ios_base::app); //open file with append option 
+    
 
     // data location
     string dataPath = "../";
@@ -69,7 +75,7 @@ int main(int argc, const char *argv[])
         dataBuffer.push_back(frame);
 
         //// EOF STUDENT ASSIGNMENT
-        cout << "#1 : LOAD IMAGE INTO BUFFER done" << endl;
+        // cout << "#1 : LOAD IMAGE INTO BUFFER done" << endl;
 
         /* DETECT IMAGE KEYPOINTS */
 
@@ -119,16 +125,20 @@ int main(int argc, const char *argv[])
                 if (vehicleRect.contains(kpoint.pt))
                 { 
                     ROIKeypoints.push_back(kpoint);
+                    
                 }
                 
             }
             keypoints = ROIKeypoints;
         }
+        //MP.7 count keypoints on the vehicle and their diameter 
+        //cout << "#Filtered keypoints: " << keypoints.size() << " with diameter: "<< keypoints[0].size << endl;   
+        //fs << detectorType << "," << keypoints.size()  << "," << keypoints[0].size  << endl;
 
-        //// EOF STUDENT ASSIGNMENT
+         //// EOF STUDENT ASSIGNMENT
 
         // optional : limit number of keypoints (helpful for debugging and learning)
-        bool bLimitKpts = true;
+        bool bLimitKpts = false;
         if (bLimitKpts)
         {
             int maxKeypoints = 50;
@@ -143,7 +153,7 @@ int main(int argc, const char *argv[])
 
         // push keypoints and descriptor for current frame to end of data buffer
         (dataBuffer.end() - 1)->keypoints = keypoints;
-        cout << "#2 : DETECT KEYPOINTS done" << endl;
+        //cout << "#2 : DETECT KEYPOINTS done" << endl;
 
         /* EXTRACT KEYPOINT DESCRIPTORS */
 
@@ -152,20 +162,25 @@ int main(int argc, const char *argv[])
         //// -> BRIEF, ORB, FREAK, AKAZE, SIFT
 
         cv::Mat descriptors;
-        string descriptorType = "BRISK"; 
-        // string descriptorType = "BRIEF";
-        // string descriptorType = "ORB";
-        // string descriptorType = "FREAK";
-        // string descriptorType = "AKAZE";
-        // string descriptorType = "SIFT";
+        //string descriptorType = "BRISK"; 
+        //string descriptorType = "BRIEF";
+        string descriptorType = "ORB";  //not working with SIFT detector
+        //string descriptorType = "FREAK";
+        //string descriptorType = "AKAZE";
+        //string descriptorType = "SIFT";
         
+        double desc_t = (double)cv::getTickCount();
+
         descKeypoints((dataBuffer.end() - 1)->keypoints, (dataBuffer.end() - 1)->cameraImg, descriptors, descriptorType);
+
+        desc_t = ((double)cv::getTickCount() - desc_t) / cv::getTickFrequency();
+
         //// EOF STUDENT ASSIGNMENT
 
         // push descriptors for current frame to end of data buffer
         (dataBuffer.end() - 1)->descriptors = descriptors;
 
-        cout << "#3 : EXTRACT DESCRIPTORS done" << endl;
+        //cout << "#3 : EXTRACT DESCRIPTORS done" << endl;
 
         if (dataBuffer.size() > 1) // wait until at least two images have been processed
         {
@@ -191,8 +206,8 @@ int main(int argc, const char *argv[])
             
 
             //// TASK MP.6 -> add KNN match selection and perform descriptor distance ratio filtering with t=0.8 in file matching2D.cpp
-            string selectorType = "SEL_NN";  //nearest neighbors (NN)     
-            // string selectorType = "SEL_KNN"; //k-nearest neighbors (KNN)  
+            // string selectorType = "SEL_NN";  //nearest neighbors (NN)     
+            string selectorType = "SEL_KNN"; //k-nearest neighbors (KNN)  
 
             matchDescriptors((dataBuffer.end() - 2)->keypoints, (dataBuffer.end() - 1)->keypoints,
                              (dataBuffer.end() - 2)->descriptors, (dataBuffer.end() - 1)->descriptors,
@@ -202,8 +217,9 @@ int main(int argc, const char *argv[])
 
             // store matches in current data frame
             (dataBuffer.end() - 1)->kptMatches = matches;
-
-            cout << "#4 : MATCH KEYPOINT DESCRIPTORS done" << endl;
+            //MP.8 Performance comparsion. Results saved to a csv file
+            //fs << detectorType << "," << keypoints.size() << "," << descriptorType << "," << matcherType << "," <<  descriptorClass <<  "," << selectorType << "," << t << "," << desc_t << endl;
+            //cout << "#4 : MATCH KEYPOINT DESCRIPTORS done" << endl;
 
             // visualize matches between current and previous image
             bVis = true;
@@ -215,10 +231,10 @@ int main(int argc, const char *argv[])
                                 matches, matchImg,
                                 cv::Scalar::all(-1), cv::Scalar::all(-1),
                                 vector<char>(), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
-
+                
                 string windowName = "Matching keypoints between two camera images";
                 cv::namedWindow(windowName, 7);
-                cv::imshow(windowName, matchImg);
+                cv::imshow(windowName, matchImg);                
                 cout << "Press key to continue to next image" << endl;
                 cv::waitKey(0); // wait for key to be pressed
             }
@@ -226,6 +242,6 @@ int main(int argc, const char *argv[])
         }
 
     } // eof loop over all images
-
+    //fs.close(); //close file 
     return 0;
 }

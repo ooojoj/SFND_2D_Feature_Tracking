@@ -32,3 +32,33 @@ See the classroom instruction and code comments for more details on each of thes
 2. Make a build directory in the top level directory: `mkdir build && cd build`
 3. Compile: `cmake .. && make`
 4. Run it: `./2D_feature_tracking`.
+
+# Project Writeup
+
+## MP.1 Data Buffer Optimization
+Lines 69-75 in MidTermProject_Camera_Student.cpp 
+
+This task was implement with the use of the `while` loop, which check the buffer size against defined threshold `dataBufferSize`. While condition is  true the first image is deleted and the next image is appended.
+
+## MP.2 Keypoint Detection
+Lines 84-113 in MidTermProject_Camera_Student.cpp 
+Lines 154-273 in matching2D_Student.cpp
+
+This task required to implement a set of detectors including HARRIS, FAST, BRISK, ORB, AKAZE, and SIFT and make them selectable by setting a string accordingly. The Harris detector was implemented as in the classroom. The remaining detectors were implmented using the OpenCV library e.g. `cv::FastFeatureDetector::create();` for FAST. It is important to higlight that with new version of OpenCV library the syntax may change and for version 4.3.0 the implementation for SIFT detector was diffrent than in the classroom; i.e. `cv::SiftFeatureDetector::create()` instead of `cv::xfeatures2d::SIFT::create()`.
+
+## MP.3 Keypoint Removal
+Lines 118-133 in MidTermProject_Camera_Student.cpp 
+
+Function `contains()` which checks whether the rectangle contains the point was used to filter out the keypoints beyond the defined rectangle. 
+
+## MP.4 Keypoint Descriptors
+Lines 165-174 in MidTermProject_Camera_Student.cpp 
+Lines 66-109 in matching2D_Student.cpp
+
+Simialry to the keypoints detection implementation the OpenCV libary was used to add a set of descriptors including BRIEF, ORB, FREAK, AKAZE and SIFT. Note that in this implementation the AKAZE descriptor works only with AKAZE detector.
+
+## MP.5 Descriptor Matching
+## MP.6 Descriptor Distance Ratio
+## MP.7 Performance Evaluation 1
+## MP.8 Performance Evaluation 2
+## MP.9 Performance Evaluation 3
